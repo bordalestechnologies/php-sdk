@@ -7,8 +7,9 @@ permissions:
 
 jobs:
   unit:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, m4, macos, arm64]
     strategy:
+      max-parallel: 1
       matrix:
         php: ['8.1', '8.2', '8.3', '8.4', '8.5']
         dependencies: ['lowest', 'highest']
@@ -50,7 +51,7 @@ jobs:
         run: vendor/bin/phpunit --testsuite=unit
 
   inspector:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, m4, macos, arm64]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -74,10 +75,16 @@ jobs:
 
   conformance-server:
     name: conformance / server
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, m4, macos, arm64]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: "none"
 
       - name: Setup Node
         uses: actions/setup-node@v7
@@ -125,7 +132,7 @@ jobs:
 
   conformance-client:
     name: conformance / client
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, m4, macos, arm64]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -165,7 +172,7 @@ jobs:
           done || echo "No results found"
 
   qa:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, m4, macos, arm64]
     steps:
       - name: Checkout
         uses: actions/checkout@v7
