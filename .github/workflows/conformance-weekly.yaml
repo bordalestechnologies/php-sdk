@@ -20,9 +20,13 @@ permissions:
 jobs:
   server:
     name: conformance / server (latest)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, m4, macos, arm64]
     steps:
       - uses: actions/checkout@v7
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
       - uses: actions/setup-node@v7
         with:
           node-version: '22'
@@ -56,10 +60,13 @@ jobs:
         with:
           name: server-badge
           path: tests/Conformance/server-conformance.json
+      - name: Cleanup
+        if: always()
+        run: docker compose -f tests/Conformance/Fixtures/docker-compose.yml down -v --remove-orphans
 
   client:
     name: conformance / client (latest)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, m4, macos, arm64]
     steps:
       - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
@@ -94,7 +101,7 @@ jobs:
 
   notify:
     name: Open issue on failure
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, m4, macos, arm64]
     needs: [server, client]
     if: failure() && github.event_name == 'schedule'
     env:
@@ -121,7 +128,7 @@ jobs:
 
   publish:
     name: Publish conformance badges
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, m4, macos, arm64]
     needs: [server, client]
     # Publish even when the suite regressed (the badge should reflect reality);
     # skip on forks, which cannot push the `badges` branch.
